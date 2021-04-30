@@ -32,7 +32,7 @@ export default class JiraApi {
    * @param {JiraApiOptions} options
    */
   constructor(options: JiraApiOptions) {
-    this.protocol = options.protocol || "http";
+    this.protocol = options.protocol || "https";
     this.host = options.host;
     this.port = options.port || null;
     this.apiVersion = options.apiVersion || "2";
@@ -67,11 +67,18 @@ export default class JiraApi {
 
     const defaultHeaders: Record<string, string> = {
       Accept: "application/json",
-      Authorization: `Bearer ${bearerToken}`,
+      Authorization: `Basic ${bearerToken}`,
     };
 
     if (options.body) {
       defaultHeaders["Content-Type"] = "application/json";
+    }
+
+    let body = undefined;
+    if (typeof options.body === "string") {
+      body = options.body;
+    } else if (options.body) {
+      body = JSON.stringify(options.body);
     }
 
     return {
@@ -81,7 +88,7 @@ export default class JiraApi {
         ...defaultHeaders,
         ...options.headers,
       },
-      body: options.body,
+      body,
     };
   }
 

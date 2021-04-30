@@ -14,7 +14,7 @@ export default {
     pathname?: string;
     query?: Record<string, string | number | boolean>;
   }) {
-    const _url = new URL("");
+    const _url = new URL("https://www.example.com");
     _url.protocol = protocol;
     _url.hostname = hostname;
     _url.pathname = pathname;
