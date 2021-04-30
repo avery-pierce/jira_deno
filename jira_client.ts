@@ -1,5 +1,6 @@
 import url from "./legacy_url.ts"
 import { RequestParams, sendRequest } from "./request.ts"
+import { encode as base64Encode } from "https://deno.land/std@0.95.0/encoding/base64.ts";
 
 type RequestFunc = typeof sendRequest
 const request = sendRequest
@@ -21,23 +22,9 @@ export default class JiraApi {
   request: RequestFunc
   webhookVersion: string
   greenhopperVersion: string
-  baseOptions: {
-    ca?: JiraApiOptions["ca"]
-    oauth?: {
-      consumer_key: OAuth["consumer_key"]
-      consumer_secret: OAuth["consumer_secret"]
-      token: OAuth["access_token"]
-      token_secret: OAuth["access_token_secret"]
-      signature_method: OAuth["signature_method"]
-    }
-    auth?: {
-      user: string
-      pass: string
-      sendImmediately?: boolean
-      bearer?: string
-    }
-    timeout?: number
-  }
+
+  username: string
+  apiToken: string
 
   /**
    * @constructor
@@ -56,37 +43,9 @@ export default class JiraApi {
     this.request = options.request || request;
     this.webhookVersion = options.webHookVersion || '1.0';
     this.greenhopperVersion = options.greenhopperVersion || '1.0';
-    this.baseOptions = {};
 
-    if (options.ca) {
-      this.baseOptions.ca = options.ca;
-    }
-
-    if (options.oauth && options.oauth.consumer_key && options.oauth.access_token) {
-      this.baseOptions.oauth = {
-        consumer_key: options.oauth.consumer_key,
-        consumer_secret: options.oauth.consumer_secret,
-        token: options.oauth.access_token,
-        token_secret: options.oauth.access_token_secret,
-        signature_method: options.oauth.signature_method || 'RSA-SHA1',
-      };
-    } else if (options.bearer) {
-      this.baseOptions.auth = {
-        user: '',
-        pass: '',
-        sendImmediately: true,
-        bearer: options.bearer,
-      };
-    } else if (options.username && options.password) {
-      this.baseOptions.auth = {
-        user: options.username,
-        pass: options.password,
-      };
-    }
-
-    if (options.timeout) {
-      this.baseOptions.timeout = options.timeout;
-    }
+    this.username = options.username
+    this.apiToken = options.apiToken
   }
 
   /**
@@ -104,8 +63,12 @@ export default class JiraApi {
     followAllRedirects: boolean,
     headers: Record<string, string>
   }> = {}) {
+
+    const bearerToken = base64Encode(`${this.username}:${this.apiToken}`)
+
     const defaultHeaders: Record<string, string> = {
-      Accept: "application/json"
+      Accept: "application/json",
+      Authorization: `Bearer ${bearerToken}`
     }
 
     if (options.body) {
@@ -250,12 +213,7 @@ export default class JiraApi {
    * requests to jira
    */
   async doRequest(requestOptions: RequestParams) {
-    const options = {
-      ...this.baseOptions,
-      ...requestOptions,
-    };
-
-    const response = await this.request(options);
+    const response = await this.request(requestOptions);
 
     if (response) {
       if (Array.isArray(response.errorMessages) && response.errorMessages.length > 0) {
@@ -2117,8 +2075,8 @@ export interface JiraApiOptions {
   protocol?: string
   host: string
   port?: string
-  username?: string
-  password?: string
+  username: string
+  apiToken: string
   apiVersion?: string
   base?: string
   intermediatePath?: string
@@ -2127,9 +2085,6 @@ export interface JiraApiOptions {
   timeout?: number
   webHookVersion?: string
   greenhopperVersion?: string
-  ca?: string
-  oauth?: OAuth
-  bearer?: string
 }
 
 /**
