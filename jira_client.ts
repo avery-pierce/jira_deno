@@ -2272,10 +2272,9 @@ export default class JiraApi {
  * instance? Ex: jira.somehost.com
  * @property {string} [port] - What port is this tool connecting to jira with? Only needed for
  * none standard ports. Ex: 8080, 3000, etc
- * @property {string} [username] - Specify a username for this tool to authenticate all
+ * @property {string} username - Specify a username for this tool to authenticate all
  * requests with.
- * @property {string} [password] - Specify a password for this tool to authenticate all
- * requests with. Cloud users need to generate an [API token](https://confluence.atlassian.com/cloud/api-tokens-938839638.html) for this value.
+ * @property {string} apiToken - The API token to use for this user.
  * @property {string} [apiVersion=2] - What version of the jira rest api is the instance the
  * tool is connecting to?
  * @property {string} [base] - What other url parts exist, if any, before the rest/api/
