@@ -59,6 +59,7 @@ export default class JiraApi {
     method: "GET" | "POST" | "PUT" | "DELETE";
     json: boolean;
     encoding: null;
+    // deno-lint-ignore no-explicit-any
     body: any;
     followAllRedirects: boolean;
     headers: Record<string, string>;
@@ -2294,10 +2295,6 @@ export default class JiraApi {
  * hit?
  * @property {string} [greenhopperVersion=1.0] - What webhook version does this api wrapper need
  * to hit?
- * @property {string} [ca] - Specify a CA certificate
- * @property {OAuth} [oauth] - Specify an OAuth object for this tool to authenticate all requests
- * using OAuth.
- * @property {string} [bearer] - Specify an OAuth bearer token to authenticate all requests with.
  */
 export interface JiraApiOptions {
   protocol?: string;
@@ -2313,24 +2310,6 @@ export interface JiraApiOptions {
   timeout?: number;
   webHookVersion?: string;
   greenhopperVersion?: string;
-}
-
-/**
- * @typedef OAuth
- * @type {object}
- * @property {string} consumer_key - The consumer entered in Jira Preferences.
- * @property {string} consumer_secret - The private RSA file.
- * @property {string} access_token - The generated access token.
- * @property {string} access_token_secret - The generated access toke secret.
- * @property {string} signature_method [signature_method=RSA-SHA1] - OAuth signurate methode
- * Possible values RSA-SHA1, HMAC-SHA1, PLAINTEXT. Jira Cloud supports only RSA-SHA1.
- */
-export interface OAuth {
-  consumer_key: string;
-  consumer_secret: string;
-  access_token: string;
-  access_token_secret: string;
-  signature_method: string;
 }
 
 /**
